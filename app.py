@@ -1,29 +1,31 @@
 from flask import Flask, request, render_template
 import os
 
+# use output .txt and prog.txt if running on local host
+
 app = Flask(__name__)
 
-condition = ["if", "else"]
+condition = ["if", "}else"]
 loop = ["for", "while"]
 stop_at = ['<', '>', '(', '{', '\n', ' ', ';']
-bracket = ['(', ')', '{', '}']
+bracket = ['(', '{']
 endst = []
-out_file = open("/home/frankenstein0208/mysite/output.txt", "w")
+out_file = open("output.txt", "w")
 
 def intialize():
     global out_file
-    out_file = open("/home/frankenstein0208/mysite/output.txt", "w")
+    out_file = open("output.txt", "w")
 
 def comm(s):
     if len(s) < 2:
         return False
-    if s == "//":
+    if s.endswith("//"):
         print("OK")
         return True
     return False
 
 def func_cin(line):
-    out_file.write("Input")
+    out_file.write("\\State Input")
     i = 5
     while i < len(line):
         temp = ""
@@ -47,6 +49,8 @@ def func_cin(line):
             s = "\\Comment{$"
             while i < len(line):
                 # print(s)
+                if(line[i] == ' '):
+                    s += '\\'
                 s += line[i]
                 i += 1
             s = s[:-1]
@@ -86,6 +90,8 @@ def func_cout(line):
             s = "\\Comment{$"
             while i < len(line):
                 # print(s)
+                if(line[i] == ' '):
+                    s += '\\'
                 s += line[i]
                 i += 1
             s = s[:-1]
@@ -113,6 +119,8 @@ def func_return(line):
             s = "\\Comment{$"
             while i < len(line):
                 # print(s)
+                if(line[i] == ' '):
+                    s += '\\'
                 s += line[i]
                 i += 1
             s = s[:-1]
@@ -132,7 +140,8 @@ def func_cond(line):
 
     if temp == "if":
         out_file.write("\\If{$")
-    elif temp == "elseif":
+        endst.append("\\EndIf")
+    elif temp == "}else if":
         out_file.write("\\ElsIf{$")
     else:
         out_file.write("\\Else\n")
@@ -141,6 +150,8 @@ def func_cond(line):
         i += 1
         s = ""
         while brack > 0:
+            if(line[i] == ' '):
+                s += '\\'
             s += line[i]
             if line[i] == '(':
                 brack += 1
@@ -160,6 +171,8 @@ def func_cond(line):
             s = "\\Comment{$"
             while i < len(line):
                 # print(s)
+                if(line[i] == ' '):
+                    s += '\\'
                 s += line[i]
                 i += 1
             s = s[:-1]
@@ -167,7 +180,6 @@ def func_cond(line):
             out_file.write(s)
             return
 
-    endst.append("\\EndIf")
 
 def func_loop(line):
     brack = 1
@@ -177,43 +189,23 @@ def func_loop(line):
     while(line[i] != '('):
         temp += line[i]
         i+=1
-
     i+=1
 
-    ini = ""
     cond = ""
-    lst = ""
-    if temp == "for":
-        while(line[i] != ';'):
-            ini += line[i]
-            i+=1
-        out_file.write("\\State ${}$\n".format(ini))
+    while(brack):
+        if(line[i] == '('):
+            brack +=1
+        elif(line[i] == ')'):
+            brack -=1
+        elif(line[i] == ' '):
+            cond += '\\'
+        cond += line[i]
         i+=1
-        while(line[i] != ';'):
-            cond += line[i]
-            i+=1
-        i+=1
-        while(brack):
-            if(line[i] == '('):
-                brack +=1
-            elif(line[i] == ')'):
-                brack -=1
-            lst += line[i]
-            i+=1
-        lst = lst[:-1]
-        i += 2
-    else:
-        while(brack):
-            if(line[i] == '('):
-                brack +=1
-            elif(line[i] == ')'):
-                brack -=1
-            cond += line[i]
-            i+=1
-        cond = cond[:-1]
-        i += 2
+    cond = cond[:-1]
+    i += 2
 
     out_file.write("\\While{$" + cond + "$}\n")
+    endst.append("\\EndWhile")
 
     temp = ""
     while(i < len(line)):
@@ -223,6 +215,8 @@ def func_loop(line):
             s = "\\Comment{$"
             while i < len(line):
                 # print(s)
+                if(line[i] == ' '):
+                    s += '\\'
                 s += line[i]
                 i += 1
             s = s[:-1]
@@ -230,10 +224,6 @@ def func_loop(line):
             out_file.write(s)
             return
 
-    if temp != "for":
-        endst.append("\\EndWhile")
-    else:
-        endst.append("\\State ${}$\n\\EndWhile".format(lst))
     print("\n")
 
 def func_state(line):
@@ -241,6 +231,8 @@ def func_state(line):
     i = 0
     temp = ""
     while i < len(line) and line[i] != ';':
+        if(line[i] == ' '):
+            temp += '\\'
         temp += line[i]
         i += 1
     i += 1
@@ -253,6 +245,8 @@ def func_state(line):
             s = "\\Comment{$"
             while i < len(line):
                 # print(s)
+                if(line[i] == ' '):
+                    s += '\\'
                 s += line[i]
                 i += 1
             s = s[:-1]
@@ -270,6 +264,8 @@ def func_comm(line):
             s = "\\Comment{$"
             while i < len(line):
                 # print(s)
+                if(line[i] == ' '):
+                    s += '\\'
                 s += line[i]
                 i += 1
             s = s[:-1]
@@ -278,7 +274,7 @@ def func_comm(line):
             return
 
 def check(word, line):
-    # print(word)
+    # print(word + " a " + line)
     if word == "cin":
         func_cin(line)
     elif word == "cout":
@@ -289,13 +285,13 @@ def check(word, line):
         func_cond(line)
     elif word in loop:
         func_loop(line)
-    elif word == "\\\\":
+    elif word == "//":
         func_comm(line)
     else:
         func_state(line)
 
 def cnvrt():
-    inFile = open("/home/frankenstein0208/mysite/prog.txt", "r")
+    inFile = open("prog.txt", "r")
     intialize()
     line = inFile.readline()
     print(len(line))
@@ -344,6 +340,22 @@ def cnvrt():
     else:
         out_file.write("}\n")
 
+    temp = ""
+    while i < len(line):
+        temp += line[i]
+        i += 1
+        if comm(temp):
+            k = "\\Comment{$"
+            while i < len(line):
+                # print(s)
+                if(line[i] == ' '):
+                    k += '\\'
+                k += line[i]
+                i += 1
+            k = k[:-1]
+            k =  k+"$}\n"
+            out_file.write(k)
+
     while inFile:
         line = inFile.readline()
         if not line:
@@ -355,6 +367,9 @@ def cnvrt():
         while i < len(line) and (line[i] not in stop_at):
             word += line[i]
             i += 1
+        print(word)
+        for i in range(len(endst)):
+            print(endst[i])
         if word == "}":
             if not endst:
                 continue
@@ -375,13 +390,13 @@ def index():
 @app.route('/convert', methods=['POST'])
 def convert_code():
 
-    if os.path.isfile("/home/frankenstein0208/mysite/prog.txt"):
-        os.remove("/home/frankenstein0208/mysite/prog.txt")
+    if os.path.isfile("prog.txt"):
+        os.remove("prog.txt")
     file = request.files['file']
-    file.save("/home/frankenstein0208/mysite/prog.txt")
+    file.save("prog.txt")
     cnvrt()
     try:
-        with open("/home/frankenstein0208/mysite/output.txt", "r") as f:
+        with open("output.txt", "r") as f:
             pseudocode = f.read()
     except FileNotFoundError:
          print("output.txt file not found.")
@@ -391,6 +406,6 @@ def convert_code():
     return render_template('index.html', pseudocode=pseudocode)
 
 
-if __name__ == '_main_':
+if __name__ == '__main__':
     # cnvrt()
     app.run(debug=True)
