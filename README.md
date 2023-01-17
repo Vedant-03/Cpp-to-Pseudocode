@@ -36,3 +36,7 @@ The script defines several functions:
 It then reads the input file line by line, and calls the appropriate function based on the keyword used in the line.
 
 Finally, it closes the output file.
+
+Link for Tutorial Video: https://drive.google.com/file/d/1eA_pvJRxE1R8_PEUlp4hjSe-5canCD6L/view?usp=share_link
+
+Link for Website: http://frankenstein0208.pythonanywhere.com/
