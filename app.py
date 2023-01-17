@@ -12,21 +12,20 @@ def index():
 
 @app.route('/convert', methods=['POST'])
 def convert_code():
-
     if os.path.isfile("prog.txt"):
         os.remove("prog.txt")
     file = request.files['file']
     file.save("prog.txt")
     try:
-        output = subprocess.check_output(["g++", "converter.cpp","-o","converter"])
-        output = subprocess.check_output(["./converter"])
+        result = subprocess.run(['python', 'convrt.py', 'prog.txt'], capture_output=True, text=True)
     except subprocess.CalledProcessError as e:
-        output = e.output
+        return "Error: {}\n{}".format(e.returncode, e.output)
     # read the contents of the output.txt file
-    with open("output.txt", "r") as f:
-        pseudocode = f.read()
-    
-    
+    try:
+        with open("/home/agrawalvedant03/mysite/output.txt", "r") as f:
+            pseudocode = f.read()
+    except IOError as e:
+        return "Error: {}".format(e)
     return render_template('index.html', pseudocode=pseudocode)
 
 

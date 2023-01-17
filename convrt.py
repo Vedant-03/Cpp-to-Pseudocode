@@ -5,7 +5,7 @@ loop = ["for", "while"]
 stop_at = ['<', '>', '(', '{', '\n', ' ', ';']
 bracket = ['(', ')', '{', '}']
 endst = []
-out_file = open("output.txt", "w")
+out_file = open("/home/agrawalvedant03/mysite/output.txt", "w")
 
 # def intialize():
 #     global condition, loop, stop_at, bracket
