@@ -27,15 +27,16 @@ def func_cin(line):
     i = 5
     while i < len(line):
         temp = ""
-        if line[i] == ";":
-            break
         while i < len(line) and line[i] != ">":
             if line[i] == ";":
                 break
             temp += line[i]
             i += 1
-        i += 2
         out_file.write(" " + temp)
+        if line[i] == ";":
+            i+=2
+            break
+        i += 2
     out_file.write("\n")
 
     temp = ""
@@ -59,6 +60,14 @@ def func_cout(line):
     while i < len(line):
         temp = ""
         while i < len(line) and line[i] != "<":
+            if line[i] =='"':
+                i += 1
+                continue
+            if line[i] == "\\":
+                temp += "$\\"
+                temp += "backslash$"
+                i += 1
+                continue
             if line[i] == ";":
                 break
             temp += line[i]
@@ -69,7 +78,6 @@ def func_cout(line):
             break
         i += 2
     out_file.write("\n")
-
     temp = ""
     while i < len(line):
         temp += line[i]
@@ -317,7 +325,8 @@ def cnvrt():
             w = ""
         i += 1
     w = w[:-1]
-    v.append(w)
+    if w!="":
+       v.append(w)
 
     out_file.write("\\documentclass{article}\n")
     out_file.write("\\usepackage{algorithm}\n")
@@ -326,12 +335,14 @@ def cnvrt():
     out_file.write("\\begin{algorithm}\n")
 
     out_file.write("\\caption{$" + s + "$}\n\\begin{algorithmic}\n")
-    out_file.write("\\Procedure{$" + s + "$}{$")
-    if v:
-        out_file.write(v[0])
+    out_file.write("\\Procedure{$" + s + "$}{")
+    if  len(v)!=0:
+        out_file.write("$"+v[0])
         for i in range(1, len(v)):
             out_file.write(", " + v[i])
         out_file.write("$}\n")
+    else:
+        out_file.write("}\n")
 
     while inFile:
         line = inFile.readline()
