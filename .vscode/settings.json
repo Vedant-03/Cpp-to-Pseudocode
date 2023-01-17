@@ -1,9 +1,0 @@
-{
-    "files.associations": {
-        "*.ejs": "html",
-        "xstring": "cpp",
-        "vector": "cpp",
-        "xlocinfo": "cpp",
-        "xutility": "cpp"
-    }
-}
